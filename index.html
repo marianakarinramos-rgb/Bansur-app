@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Catálogo</title>
+    <title id="page-title">Catálogo | Bansur</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="/manifest.json">
@@ -69,6 +69,9 @@
         }
         .color-selector input[type="radio"]:checked + label { background-color: var(--brand-accent); color: white; border-color: var(--brand-accent); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
+        .cat-chip { padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; border: 1px solid var(--brand-border); background: white; color: var(--brand-text); cursor: pointer; transition: 0.2s; white-space: nowrap; text-transform: uppercase; }
+        .cat-chip.active, .cat-chip:hover { background: var(--brand-accent); color: white; border-color: var(--brand-accent); }
+
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
         .toast { padding: 12px 24px; border-radius: 4px; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: slideIn 0.3s forwards; background: var(--brand-text); color: white; font-size: 12px; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -82,7 +85,7 @@
     <div id="carga-overlay" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-[99999] backdrop-blur-sm">
         <div class="text-center bg-white p-6 rounded-lg shadow-xl">
             <i class="fas fa-circle-notch fa-spin text-4xl text-brand-accent mb-3"></i>
-            <p id="carga-texto" class="text-brand-text font-bold text-sm tracking-widest uppercase mt-2">Iniciando Base de Datos...</p>
+            <p id="carga-texto" class="text-brand-text font-bold text-sm tracking-widest uppercase mt-2">Cargando Catálogo Bansur...</p>
         </div>
     </div>
 
@@ -95,26 +98,9 @@
     <!-- 1. VISTA TIENDA -->
     <!-- ============================================== -->
     <div id="vista-tienda" class="flex-grow">
-        <!-- BANNER PWA -->
-        <div id="pwa-install-banner" class="hidden bg-brand-accent/10 border border-brand-accent/30 rounded-2xl p-4 mx-6 mt-4 flex items-center justify-between fade-in shadow-sm max-w-7xl lg:mx-auto">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-brand-accent text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-sm">
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
-                <div>
-                    <h4 class="text-xs font-bold text-brand-text">Instalar Aplicación</h4>
-                    <p class="text-[10px] text-brand-text/60">Acceso directo en tu pantalla</p>
-                </div>
-            </div>
-            <button onclick="ejecutarInstalacionPWA()" class="bg-brand-accent text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md hover:opacity-90 transition">
-                Instalar
-            </button>
-        </div>
-
-        <header class="bg-white border-b border-brand-border sticky top-0 z-40 shadow-sm mt-2">
+        <header class="bg-white border-b border-brand-border sticky top-0 z-40 shadow-sm">
             <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                 <div id="header-branding" class="flex items-center select-none"></div>
-                
                 <div class="flex items-center gap-3">
                     <button onclick="compartirTienda()" class="text-brand-text/50 hover:text-brand-accent text-lg transition bg-brand-bg w-10 h-10 rounded-full flex items-center justify-center border border-brand-border shadow-sm">
                         <i class="fas fa-share-alt"></i>
@@ -130,19 +116,25 @@
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full">
-            <div class="mb-8 max-w-lg mx-auto relative">
-                <i class="fas fa-search absolute left-4 top-3.5 text-brand-text/40"></i>
-                <input type="text" id="buscador" oninput="renderProductos()" placeholder="Buscá por SKU o nombre..." class="w-full bg-white border border-brand-border text-brand-text pl-11 pr-10 py-3 rounded-lg outline-none focus:border-brand-accent transition shadow-sm text-sm font-medium">
-                <button onclick="document.getElementById('buscador').value=''; renderProductos();" class="absolute right-4 top-3.5 text-brand-text/30 hover:text-brand-accent transition cursor-pointer">
-                    <i class="fas fa-times-circle text-lg"></i>
-                </button>
+        <!-- BARRA DE BÚSQUEDA Y CATEGORÍAS -->
+        <div class="bg-white/80 border-b border-brand-border py-4 px-6 sticky top-[73px] z-30 backdrop-blur-md shadow-xs">
+            <div class="max-w-7xl mx-auto space-y-3">
+                <div class="max-w-lg mx-auto relative">
+                    <i class="fas fa-search absolute left-4 top-3.5 text-brand-text/40"></i>
+                    <input type="text" id="buscador" oninput="renderProductos()" placeholder="Buscar por SKU o nombre de artículo..." class="w-full bg-brand-bg border border-brand-border text-brand-text pl-11 pr-10 py-2.5 rounded-xl outline-none focus:border-brand-accent transition shadow-sm text-sm font-medium">
+                    <button onclick="document.getElementById('buscador').value=''; renderProductos();" class="absolute right-4 top-3 text-brand-text/30 hover:text-brand-accent transition cursor-pointer">
+                        <i class="fas fa-times-circle text-lg"></i>
+                    </button>
+                </div>
+                <!-- Categorías Chips -->
+                <div class="flex gap-2 overflow-x-auto pb-1 justify-start md:justify-center scrollbar-none" id="contenedor-categorias"></div>
             </div>
-            
+        </div>
+
+        <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full">
             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5"></div>
         </main>
         
-        <!-- FOOTER MARCA GESTO SMART -->
         <footer class="py-6 text-center mt-auto border-t border-brand-border/30 bg-brand-bg">
             <div class="flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-default">
                 <span class="text-[11px] text-brand-text font-medium tracking-wide">creado con</span>
@@ -154,7 +146,7 @@
 
     <!-- Modal Quick View -->
     <div id="modal-quick-view" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm z-[99999]">
-        <div class="bg-white border border-brand-border rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden fade-in flex flex-col md:flex-row relative max-h-[90vh] md:max-h-[80vh]">
+        <div class="bg-white border border-brand-border rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden fade-in flex flex-col md:flex-row relative max-h-[90vh]">
             <button onclick="cerrarQuickView()" class="absolute top-4 right-4 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition shadow-md z-10">
                 <i class="fas fa-times"></i>
             </button>
@@ -166,9 +158,7 @@
                     <span id="qv-sku" class="text-[10px] bg-white border border-brand-border text-brand-text px-2 py-0.5 rounded font-bold uppercase mb-2 inline-block shadow-sm"></span>
                     <h3 id="qv-nombre" class="font-serif text-2xl md:text-3xl font-black text-brand-text leading-tight"></h3>
                 </div>
-
                 <div id="qv-colores-container" class="mt-2 mb-4"></div>
-
                 <div class="mt-auto pt-6 border-t border-brand-border flex flex-col sm:flex-row justify-between items-center gap-4">
                     <span id="qv-precio" class="text-3xl font-black text-brand-accent font-sans w-full sm:w-auto text-center sm:text-left"></span>
                     <button id="qv-btn-add" class="w-full sm:w-auto bg-brand-accent hover:opacity-90 text-white px-8 py-3.5 rounded-xl font-bold transition shadow-sm uppercase tracking-wider flex justify-center items-center gap-2">
@@ -208,7 +198,7 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 flex flex-col text-center fade-in">
             <div class="w-16 h-16 bg-brand-accent/10 text-brand-accent rounded-full flex items-center justify-center mx-auto mb-4 text-2xl border border-brand-accent/30"><i class="fas fa-lock"></i></div>
             <h3 class="font-serif text-xl text-brand-text mb-2">Acceso Restringido</h3>
-            <p class="text-xs text-brand-text/60 mb-6">Ingresá tu PIN de seguridad para gestionar la tienda.</p>
+            <p class="text-xs text-brand-text/60 mb-6">Ingresá tu PIN para administrar el catálogo.</p>
             <input type="password" id="admin-pin-input" placeholder="****" maxlength="4" class="w-full text-center text-3xl tracking-[0.5em] border border-brand-border p-3 rounded-xl outline-none focus:border-brand-accent font-bold text-brand-text mb-6 bg-brand-bg" onkeypress="if(event.key === 'Enter') verificarPinAdmin()">
             <div class="flex gap-3">
                 <button onclick="cerrarModalLogin()" class="flex-1 bg-white text-brand-text/70 border border-brand-border py-3 rounded-xl font-bold hover:bg-stone-100 transition">Cancelar</button>
@@ -225,37 +215,30 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-brand-accent text-white rounded-lg flex items-center justify-center text-lg"><i class="fas fa-sliders-h"></i></div>
                 <div>
-                    <h2 class="font-serif text-xl text-brand-text leading-tight">Panel de Control de Tienda</h2>
-                    <span class="text-[10px] text-brand-text/60 font-bold uppercase tracking-widest">Configuración General y Matriz</span>
+                    <h2 class="font-serif text-xl text-brand-text leading-tight">Panel Bansur Admin</h2>
+                    <span class="text-[10px] text-brand-text/60 font-bold uppercase tracking-widest">Gestión de Artículos y Categorías</span>
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="compartirTienda()" class="bg-stone-100 hover:bg-stone-200 text-brand-text border border-brand-border px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                    <i class="fas fa-share-alt mr-2 text-brand-accent"></i> Compartir Link
-                </button>
                 <button onclick="verTiendaNuevaPestana()" class="bg-stone-100 hover:bg-stone-200 text-brand-text border border-brand-border px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
                     <i class="fas fa-external-link-alt mr-2 text-brand-accent"></i> Ver Tienda ↗
                 </button>
                 <button onclick="cerrarSesion()" class="bg-brand-accent text-white px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Salir del Admin
+                    <i class="fas fa-sign-out-alt mr-2"></i> Salir
                 </button>
             </div>
         </header>
 
         <main class="flex-1 max-w-7xl mx-auto w-full p-6 space-y-6 flex-grow">
             <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm space-y-4">
-                <h3 class="font-serif text-lg text-brand-text">⚙️ Identidad y Seguridad</h3>
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <h3 class="font-serif text-lg text-brand-text">⚙️ Configuración General</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Nombre Tienda</label>
                         <input type="text" id="input-nombre-tienda" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Logo (Opcional)</label>
-                        <input type="file" id="input-logo" accept="image/*" class="w-full text-xs text-brand-text file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:font-bold file:bg-brand-bg file:text-brand-text hover:file:bg-brand-border cursor-pointer transition outline-none" onchange="subirLogoApp(event)">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">WhatsApp</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">WhatsApp Pedidos</label>
                         <input type="text" id="input-whatsapp" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
                     </div>
                     <div>
@@ -269,8 +252,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-accent mb-1">PIN Admin (4 Dígitos)</label>
-                        <input type="password" id="input-pin" maxlength="4" placeholder="1234" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent text-brand-accent font-bold text-center tracking-widest">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-accent mb-1">PIN Admin</label>
+                        <input type="password" id="input-pin" maxlength="4" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent text-brand-accent font-bold text-center tracking-widest">
                     </div>
                 </div>
                 <div class="flex justify-end pt-2">
@@ -281,25 +264,23 @@
             <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex flex-wrap gap-2">
                     <button onclick="abrirModalNuevoProducto()" class="bg-brand-text hover:bg-brand-accent text-white px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                        <i class="fas fa-plus mr-2"></i> Nuevo Artículo Manual
+                        <i class="fas fa-plus mr-2"></i> Nuevo Artículo
                     </button>
-                    <div class="w-px bg-brand-border mx-2"></div>
                     <label class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center shadow-sm">
                         <i class="fas fa-file-excel mr-2"></i> Subir Excel
                         <input type="file" accept=".xlsx" class="hidden" onchange="importarExcel(event)">
                     </label>
                     <button onclick="generarExcelMuestra()" class="bg-stone-100 hover:bg-stone-200 text-brand-text px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-brand-border">
-                        <i class="fas fa-download mr-2 text-brand-accent"></i> Bajar Plantilla
+                        <i class="fas fa-download mr-2 text-brand-accent"></i> Bajar Plantilla Excel
                     </button>
                     <button onclick="vaciarDB()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-red-200">
                         <i class="fas fa-trash-alt mr-2"></i> Vaciar DB
                     </button>
                 </div>
-                
                 <div class="bg-brand-bg border border-brand-border p-3 rounded-lg flex items-center gap-3">
                     <div class="text-xs">
-                        <span class="font-bold block text-brand-text">Subida Masiva de Fotos</span>
-                        <span class="text-[10px] text-brand-text/60">Inteligente: (ej. 4 negro.jpg)</span>
+                        <span class="font-bold block text-brand-text">Carga de Fotos Masiva</span>
+                        <span class="text-[10px] text-brand-text/60">Ej: SKU + Color.jpg</span>
                     </div>
                     <label class="bg-brand-accent hover:opacity-90 text-white px-4 py-2 rounded-md text-xs font-bold cursor-pointer transition shadow-sm">
                         <i class="fas fa-arrow-up mr-2"></i> Subir Fotos
@@ -315,9 +296,9 @@
                             <tr>
                                 <th class="px-4 py-3 w-16">Foto</th>
                                 <th class="px-4 py-3 w-20">SKU</th>
+                                <th class="px-4 py-3 w-32">Categoría</th>
                                 <th class="px-4 py-3">Producto</th>
                                 <th class="px-4 py-3">Precio</th>
-                                <th class="px-4 py-3">Colores / Variantes</th>
                                 <th class="px-4 py-3 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -326,8 +307,7 @@
                 </div>
             </div>
         </main>
-
-        <!-- FOOTER MARCA GESTO SMART ADMIN -->
+        
         <footer class="py-6 text-center mt-auto border-t border-brand-border/50 bg-stone-50">
             <div class="flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity cursor-default">
                 <span class="text-[11px] text-brand-text font-medium tracking-wide">creado con</span>
@@ -337,20 +317,18 @@
         </footer>
     </div>
 
-    <!-- MODAL EDICIÓN Y CREACIÓN MANUAL -->
+    <!-- MODAL EDICIÓN Y CREACIÓN -->
     <div id="modal-edicion" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[99999] backdrop-blur-sm p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden">
             <div class="p-5 border-b border-brand-border flex justify-between items-center bg-brand-bg">
-                <h3 id="modal-titulo" class="font-serif text-xl text-brand-text">✏️ Editar Modelo</h3>
+                <h3 id="modal-titulo" class="font-serif text-xl text-brand-text">✏️ Editar Artículo</h3>
                 <button onclick="cerrarModalEdicion()" class="text-brand-text/50 hover:text-brand-accent text-xl"><i class="fas fa-times"></i></button>
             </div>
-            
             <div class="p-5 overflow-y-auto space-y-4 flex-grow">
                 <input type="hidden" id="edit-id">
-                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">SKU *</label>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">SKU / ART *</label>
                         <input type="text" id="edit-sku" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent font-bold">
                     </div>
                     <div>
@@ -358,23 +336,23 @@
                         <input type="number" id="edit-precio" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent">
                     </div>
                 </div>
-                
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">Categoría *</label>
+                    <input type="text" id="edit-categoria" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent uppercase font-bold" placeholder="EJ: JUGUETES, LIBRERIA, BAZAR...">
+                </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">Nombre del Producto *</label>
                     <input type="text" id="edit-nombre" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent">
                 </div>
-
                 <div id="grupo-crear-colores" class="hidden">
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">Colores / Variantes (Separados por coma) *</label>
-                    <input type="text" id="edit-colores-texto" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent" placeholder="Ej: Negro, Blanco, Suela">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-brand-text/70 mb-1">Variantes / Colores (Separados por coma)</label>
+                    <input type="text" id="edit-colores-texto" class="w-full border border-brand-border p-2 rounded-lg text-sm outline-none focus:border-brand-accent" placeholder="Ej: General o Surtidos, Azul, Rojo">
                 </div>
-
                 <div id="grupo-editar-fotos" class="border-t border-brand-border pt-4 mt-4">
-                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-text mb-3">🖼️ Fotos por Color (Carga Individual)</label>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-text mb-3">🖼️ Fotos por Variante</label>
                     <div id="edit-colores-container" class="space-y-3"></div>
                 </div>
             </div>
-            
             <div class="p-5 border-t border-brand-border bg-stone-50 flex justify-end gap-3">
                 <button onclick="cerrarModalEdicion()" class="px-5 py-2.5 rounded-lg text-xs font-bold border border-brand-border text-brand-text hover:bg-brand-bg transition">Cancelar</button>
                 <button onclick="guardarEdicionProducto()" class="bg-brand-accent hover:opacity-90 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition shadow-sm"><i class="fas fa-save mr-2"></i>Guardar</button>
@@ -385,26 +363,15 @@
     <div id="toast-container"></div>
 
     <script>
-        // Modal Utilities
         function abrirModalUI(id) { const el = document.getElementById(id); if(el){ el.classList.remove('hidden'); el.classList.add('flex'); } }
         function cerrarModal(id) { const el = document.getElementById(id); if(el){ el.classList.add('hidden'); el.classList.remove('flex'); } }
 
-        function verTiendaNuevaPestana() {
-            window.open(window.location.href.split('?')[0], '_blank');
-        }
+        function verTiendaNuevaPestana() { window.open(window.location.href.split('?')[0], '_blank'); }
 
         function compartirTienda() {
-            const shareData = {
-                title: db.config.nombre || 'Mi Tienda',
-                text: `Mirá nuestro catálogo online:`,
-                url: window.location.href.split('?')[0]
-            };
-            if (navigator.share) {
-                navigator.share(shareData).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(window.location.href.split('?')[0]);
-                toast('¡Link del catálogo copiado!');
-            }
+            const shareData = { title: db.config.nombre || 'Bansur', text: `Mirá nuestro catálogo online:`, url: window.location.href.split('?')[0] };
+            if (navigator.share) { navigator.share(shareData).catch(() => {}); } 
+            else { navigator.clipboard.writeText(window.location.href.split('?')[0]); toast('¡Link del catálogo copiado!'); }
         }
 
         function abrirModalAdmin() {
@@ -412,63 +379,18 @@
             abrirModalUI('modal-login');
             setTimeout(() => document.getElementById('admin-pin-input').focus(), 100);
         }
-
-        function cerrarModalLogin() {
-            cerrarModal('modal-login');
-        }
+        function cerrarModalLogin() { cerrarModal('modal-login'); }
 
         function verificarPinAdmin() {
             const pin = document.getElementById('admin-pin-input').value;
-            const pinValido = db.config.pinAdmin || '1234';
-            if (pin === pinValido) {
-                cerrarModalLogin();
-                document.body.classList.add('modo-admin');
-                toast('🔓 Modo Administrador Activado');
-            } else {
-                toast('❌ PIN Incorrecto');
-                document.getElementById('admin-pin-input').value = '';
-            }
+            if (pin === (db.config.pinAdmin || '1234')) {
+                cerrarModalLogin(); document.body.classList.add('modo-admin'); toast('🔓 Modo Administrador Activado');
+            } else { toast('❌ PIN Incorrecto'); document.getElementById('admin-pin-input').value = ''; }
         }
 
-        let deferredPrompt = null;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner) banner.classList.remove('hidden');
-        });
+        let categoriaActiva = 'TODAS';
 
-        function ejecutarInstalacionPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        document.getElementById('pwa-install-banner').classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                });
-            }
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('PWA SW Error:', err));
-            });
-        }
-
-        // Flecha de Scroll Automática
-        window.addEventListener('scroll', () => {
-            const btn = document.getElementById('btn-subir');
-            if (window.scrollY > 300) {
-                btn.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
-                btn.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            } else {
-                btn.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
-                btn.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
-            }
-        });
-
-        function comprimirImagen(file, callback, maxSize = 600, format = 'image/jpeg') {
+        function comprimirImagen(file, callback, maxSize = 600) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -480,9 +402,7 @@
                         else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL(format, 0.7); 
-                        if (dataUrl === "data:,") throw new Error("Canvas vacio");
-                        callback(dataUrl);
+                        callback(canvas.toDataURL('image/jpeg', 0.7));
                     } catch(err) { callback(e.target.result); }
                 }
                 img.onerror = function() { callback(e.target.result); }
@@ -497,7 +417,6 @@
         }
 
         const limpiarTexto = (str) => { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[-_\s]+/g, ''); };
-        const toConsonants = (str) => { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[aeiouáéíóúü\s-_\W]/g, ''); };
 
         const paletasPantone = {
             suede: { bg: '#F2E8DA', text: '#593C31', accent: '#7B3F32', border: '#DFD0BB' },
@@ -507,48 +426,46 @@
             rosa: { bg: '#FEF4F8', text: '#524047', accent: '#F4A2CD', border: '#F0D5E1' }
         };
 
-        let db = { config: { nombre: 'Hippie Zapatos', whatsapp: '5491121586674', paleta: 'suede', logo: '', pinAdmin: '1234' }, productos: [] };
+        let db = { config: { nombre: 'Bansur Mayorista', whatsapp: '5491121586674', paleta: 'suede', logo: '', pinAdmin: '1234' }, productos: [] };
         let carrito = []; let seleccionActual = {}; 
 
         function initApp() {
             document.getElementById('carga-overlay').style.display = 'none';
-            if(!db.config) db.config = { nombre: 'Hippie Zapatos', whatsapp: '5491121586674', paleta: 'suede', logo: '', pinAdmin: '1234' };
-            if(db.config.logo === undefined) db.config.logo = '';
+            if(!db.config) db.config = { nombre: 'Bansur Mayorista', whatsapp: '5491121586674', paleta: 'suede', logo: '', pinAdmin: '1234' };
             if(!db.config.pinAdmin) db.config.pinAdmin = '1234';
             
             if(db.productos.length === 0) {
                 db.productos = [
-                    { id: '1', sku: '4', nombre: 'Zueco Roma', precioBase: 69900, colores: [{ id: 'c0', nombre: 'Nude', img: '' }, { id: 'c1', nombre: 'Negro', img: '' }] },
-                    { id: '2', sku: '5', nombre: 'Sandalia Tulum', precioBase: 59999, colores: [{ id: 'c0', nombre: 'Negro', img: '' }, { id: 'c1', nombre: 'Animal Print', img: '' }, { id: 'c2', nombre: 'Rafia', img: '' }, { id: 'c4', nombre: 'Suela', img: '' }, { id: 'c5', nombre: 'Plateado', img: '' }] }
+                    { id: '1', sku: 'A26309', categoria: 'JUGUETES', nombre: 'Masa Moldeable x12', precioBase: 3400, colores: [{ id: 'c0', nombre: 'General', img: '' }] },
+                    { id: '2', sku: 'B26310', categoria: 'JUGUETES', nombre: 'Masa Moldeable x24', precioBase: 7150, colores: [{ id: 'c0', nombre: 'General', img: '' }] },
+                    { id: '3', sku: 'B3400B', categoria: 'LIBRERIA', nombre: 'Cargador IPhone 5W con Cable', precioBase: 4805, colores: [{ id: 'c0', nombre: 'General', img: '' }] },
+                    { id: '4', sku: 'DZ3', categoria: 'BAZAR', nombre: 'Organizador Zapatero 3 Estantes', precioBase: 6400, colores: [{ id: 'c0', nombre: 'General', img: '' }] }
                 ];
             }
 
             actualizarIdentidadVisual();
-            db.productos.forEach(p => {
-                if(p.colores && p.colores.length > 0) {
-                    if(!seleccionActual[p.id]) seleccionActual[p.id] = { color: p.colores[0].id, qty: 1 };
-                }
-            });
-            renderProductos(); renderStockAdmin();
+            db.productos.forEach(p => { if(p.colores && p.colores.length > 0 && !seleccionActual[p.id]) seleccionActual[p.id] = { color: p.colores[0].id, qty: 1 }; });
+            renderCategoriasChips();
+            renderProductos(); 
+            renderStockAdmin();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('carga-overlay').style.display='flex';
-            localforage.getItem('gesto_hippie_idb').then(function(value) {
+            localforage.getItem('bansur_catalogo_idb').then(function(value) {
                 if (value && value.productos) { db = value; }
                 initApp();
             }).catch(function(err) { initApp(); });
         });
 
         function salvar() {
-            localforage.setItem('gesto_hippie_idb', db).then(() => {
+            localforage.setItem('bansur_catalogo_idb', db).then(() => {
                 if(typeof firestoreDb !== 'undefined' && firestoreDb) {
-                    firestoreDb.collection("lite_erp").doc("catalogo_nare").set(db).catch(e => console.error("Error Firebase:", e));
+                    firestoreDb.collection("lite_erp").doc("catalogo_bansur").set(db).catch(e => console.error(e));
                 }
-            }).catch(function(err) { toast("❌ Error al guardar base de datos."); });
+            });
         }
 
-        // Firebase Sync
         const firebaseConfig = {
             apiKey: "AIzaSyBzgIYRyMFLL616w_OhOO_dC6bR7df5kCI",
             authDomain: "catalogo-sami.firebaseapp.com",
@@ -557,20 +474,14 @@
             messagingSenderId: "82548197889",
             appId: "1:82548197889:web:50330ffc4b55d640ef8e00"
         };
-        
         let firestoreDb = null;
         try { 
             if (typeof firebase !== 'undefined') { 
                 firebase.initializeApp(firebaseConfig); 
                 firestoreDb = firebase.firestore(); 
-                firebase.auth().signInAnonymously().catch(err => console.warn("Error en Auth:", err));
-                
-                firestoreDb.collection("lite_erp").doc("catalogo_nare").onSnapshot(doc => {
-                    if(doc.exists) { 
-                        db = doc.data();
-                        actualizarIdentidadVisual();
-                        renderProductos(); renderStockAdmin();
-                    }
+                firebase.auth().signInAnonymously().catch(() => {});
+                firestoreDb.collection("lite_erp").doc("catalogo_bansur").onSnapshot(doc => {
+                    if(doc.exists) { db = doc.data(); actualizarIdentidadVisual(); renderCategoriasChips(); renderProductos(); renderStockAdmin(); }
                 });
             } 
         } catch(err) {}
@@ -587,14 +498,7 @@
             aplicarPaleta(db.config.paleta);
             document.getElementById('page-title').innerText = `${db.config.nombre} | Catálogo`;
             const headerBranding = document.getElementById('header-branding');
-            
-            if(db.config.logo && db.config.logo.length > 100) {
-                headerBranding.innerHTML = `<div class="w-12 h-12 rounded-full border-2 border-brand-border flex items-center justify-center overflow-hidden bg-brand-bg mr-3 shrink-0"><img src="${db.config.logo}" class="w-full h-full object-cover bg-white"></div><div><h1 class="font-serif text-2xl text-brand-text leading-none">${db.config.nombre}</h1></div>`;
-            } else {
-                const palabras = db.config.nombre.trim().split(' ');
-                let htmlLogo = palabras.length > 1 ? `<span class="block">${palabras[0]}</span><span class="block text-[0.65em] opacity-90">${palabras.slice(1).join(' ')}</span>` : `<span class="block">${palabras[0]}</span>`;
-                headerBranding.innerHTML = `<div class="font-serif font-black uppercase text-brand-text leading-none text-center border-y-2 border-brand-text py-1.5 px-2 tracking-widest text-xl">${htmlLogo}</div>`;
-            }
+            headerBranding.innerHTML = `<div class="font-serif font-black uppercase text-brand-text leading-none text-center border-y-2 border-brand-text py-1.5 px-3 tracking-widest text-xl">${db.config.nombre}</div>`;
             
             document.getElementById('input-nombre-tienda').value = db.config.nombre;
             document.getElementById('input-whatsapp').value = db.config.whatsapp;
@@ -602,32 +506,39 @@
             document.getElementById('input-pin').value = db.config.pinAdmin || '1234';
         }
 
-        function subirLogoApp(e) {
-            const file = e.target.files[0]; if(!file) return;
-            comprimirImagen(file, (base64) => { db.config.logo = base64; salvar(); actualizarIdentidadVisual(); toast('Logo actualizado 🎨'); }, 300, 'image/png');
-        }
-
         function guardarConfiguracion() {
-            db.config.nombre = document.getElementById('input-nombre-tienda').value.trim() || 'Tienda';
+            db.config.nombre = document.getElementById('input-nombre-tienda').value.trim() || 'Bansur';
             db.config.whatsapp = document.getElementById('input-whatsapp').value.trim() || '5491121586674';
             db.config.paleta = document.getElementById('select-paleta').value;
             db.config.pinAdmin = document.getElementById('input-pin').value.trim() || '1234';
-            salvar(); actualizarIdentidadVisual(); toast('¡Configuración guardada! ✨');
+            salvar(); actualizarIdentidadVisual(); toast('¡Configuración guardada!');
         }
 
         const formatMoney = (monto) => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(monto);
 
-        // --- QUICK VIEW (SIN TALLES) ---
+        function renderCategoriasChips() {
+            const container = document.getElementById('contenedor-categorias');
+            const cats = ['TODAS', ...new Set(db.productos.map(p => (p.categoria || 'GENERAL').toUpperCase().trim()))];
+            container.innerHTML = cats.map(cat => `
+                <button onclick="filtrarCategoria('${cat}')" class="cat-chip ${cat === categoriaActiva ? 'active' : ''}">${cat}</button>
+            `).join('');
+        }
+
+        function filtrarCategoria(cat) {
+            categoriaActiva = cat;
+            renderCategoriasChips();
+            renderProductos();
+        }
+
         function abrirQuickView(id) {
             const p = db.productos.find(x => x.id === id); if(!p) return;
             const state = seleccionActual[id] || { color: p.colores[0].id };
             const colorActivo = p.colores.find(c => c.id === state.color) || p.colores[0];
-            
             let img = colorActivo.img;
-            if(!img || img.length < 100) img = getPlaceholder('SKU ' + p.sku + (colorActivo.nombre!=='General' ? ' '+colorActivo.nombre : ''));
+            if(!img || img.length < 100) img = getPlaceholder('ART: ' + p.sku);
 
             document.getElementById('qv-img').src = img;
-            document.getElementById('qv-sku').innerText = 'SKU: ' + p.sku;
+            document.getElementById('qv-sku').innerText = 'ART: ' + p.sku + ' | ' + (p.categoria || 'GENERAL');
             document.getElementById('qv-nombre').innerText = p.nombre;
             document.getElementById('qv-precio').innerText = formatMoney(p.precioBase);
 
@@ -654,32 +565,35 @@
         function cerrarQuickView() { cerrarModal('modal-quick-view'); }
 
         function qvCambiarColor(prodId, colorId, colorNombre, imgUrl) {
-            cambiarColor(prodId, colorId, colorNombre, imgUrl); // Sincroniza con grilla
+            cambiarColor(prodId, colorId, colorNombre, imgUrl);
             const imgEl = document.getElementById('qv-img');
             const p = db.productos.find(x => x.id === prodId);
             if(imgUrl && imgUrl.length > 100) imgEl.src = imgUrl; 
-            else imgEl.src = getPlaceholder('SKU ' + (p ? p.sku : '') + ' ' + colorNombre);
+            else imgEl.src = getPlaceholder('ART ' + (p ? p.sku : ''));
             const labelEl = document.getElementById('qv-label-color');
             if(labelEl) labelEl.innerText = colorNombre;
         }
 
-        // --- RENDER TIENDA ---
         function renderProductos() {
             const grid = document.getElementById('grid-productos');
             const term = document.getElementById('buscador').value.toLowerCase();
-            const filtrados = db.productos.filter(p => p.nombre.toLowerCase().includes(term) || p.sku.toLowerCase().includes(term));
+            
+            let filtrados = db.productos.filter(p => {
+                const matchTerm = p.nombre.toLowerCase().includes(term) || p.sku.toLowerCase().includes(term);
+                const matchCat = categoriaActiva === 'TODAS' || (p.categoria || 'GENERAL').toUpperCase().trim() === categoriaActiva;
+                return matchTerm && matchCat;
+            });
 
             grid.innerHTML = filtrados.length ? filtrados.map(p => {
                 if(!seleccionActual[p.id]) seleccionActual[p.id] = { color: p.colores[0].id, qty: 1 };
                 const state = seleccionActual[p.id]; const colorActivo = p.colores.find(c => c.id === state.color) || p.colores[0];
-                let imgFinal = colorActivo.img; let phText = 'SKU ' + p.sku;
-                if (colorActivo.nombre !== 'General') phText += ' ' + colorActivo.nombre;
-                if(!imgFinal || imgFinal.length < 100) imgFinal = getPlaceholder(phText);
+                let imgFinal = colorActivo.img; 
+                if(!imgFinal || imgFinal.length < 100) imgFinal = getPlaceholder('ART: ' + p.sku);
                 
                 return `
                 <div class="bg-white border border-brand-border rounded-xl shadow-sm overflow-hidden flex flex-col">
                     <div class="aspect-[4/5] bg-stone-100 relative overflow-hidden border-b border-brand-border group cursor-pointer" onclick="abrirQuickView('${p.id}')">
-                        <img src="${imgFinal}" alt="${p.nombre}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:opacity-90" id="img-prod-${p.id}" onerror="this.src='${getPlaceholder('SKU '+p.sku)}'">
+                        <img src="${imgFinal}" alt="${p.nombre}" class="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:opacity-90" id="img-prod-${p.id}" onerror="this.src='${getPlaceholder('ART '+p.sku)}'">
                         <div class="absolute inset-0 bg-black/10 hidden group-hover:flex items-center justify-center transition">
                             <span class="bg-white text-brand-text text-[10px] font-bold px-3 py-1.5 rounded shadow-lg uppercase tracking-wider"><i class="fas fa-search-plus mr-1"></i> Ver Detalle</span>
                         </div>
@@ -688,8 +602,8 @@
                     <div class="p-4 flex flex-col flex-grow justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-[9px] bg-stone-100 text-brand-text font-bold px-2 py-0.5 rounded uppercase border border-brand-border">Catálogo</span>
-                                <span class="text-[9px] text-brand-text/50 font-bold">SKU: ${p.sku}</span>
+                                <span class="text-[9px] bg-stone-100 text-brand-text font-bold px-2 py-0.5 rounded uppercase border border-brand-border">${p.categoria || 'GENERAL'}</span>
+                                <span class="text-[9px] text-brand-accent font-bold">ART: ${p.sku}</span>
                             </div>
                             <h2 class="font-sans text-xs font-bold text-brand-text mb-2 leading-snug line-clamp-2">${p.nombre}</h2>
                             
@@ -712,20 +626,20 @@
                                 <span class="text-[10px] font-bold text-gray-400 uppercase">Precio</span>
                                 <span class="text-base font-black text-brand-accent">${formatMoney(p.precioBase)}</span>
                             </div>
-                            <button onclick="addCart('${p.id}')" class="w-full bg-brand-accent hover:opacity-90 text-white font-bold text-xs py-2.5 rounded-lg uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2">
+                            <button onclick="addCart('${p.id}')" class="w-full bg-brand-accent hover:opacity-90 text-white font-bold text-xs py-2.5 rounded-xl uppercase tracking-wider transition shadow-sm flex items-center justify-center gap-2">
                                 <i class="fas fa-cart-plus"></i> Agregar
                             </button>
                         </div>
                     </div>
                 </div>
-            `}).join('') : '<div class="col-span-full py-20 text-center text-brand-text/40 font-serif text-xl">No encontramos productos para tu búsqueda...</div>';
+            `}).join('') : '<div class="col-span-full py-20 text-center text-brand-text/40 font-serif text-xl">No encontramos artículos en esta categoría...</div>';
         }
 
         function cambiarColor(prodId, colorId, colorNombre, imgUrl) {
             seleccionActual[prodId].color = colorId; const p = db.productos.find(x => x.id === prodId); const imgEl = document.getElementById(`img-prod-${prodId}`);
             if(imgEl) {
                 if(imgUrl && imgUrl.length > 100) imgEl.src = imgUrl;
-                else imgEl.src = getPlaceholder('SKU ' + (p ? p.sku : '') + ' ' + colorNombre);
+                else imgEl.src = getPlaceholder('ART ' + (p ? p.sku : ''));
             }
             const labelEl = document.getElementById(`label-color-${prodId}`); if(labelEl) labelEl.innerText = colorNombre;
         }
@@ -738,7 +652,7 @@
                 let finalImg = col.img || p.colores[0].img; if(!finalImg || finalImg.length < 100) finalImg = getPlaceholder(p.sku);
                 carrito.push({ key: key, prodNombre: p.nombre, colorNombre: col.nombre, precio: p.precioBase, qty: 1, img: finalImg });
             }
-            updateCartUI(); toast('Agregado al pedido'); if(document.getElementById('modal-carrito').classList.contains('translate-x-full')) toggleCart();
+            updateCartUI(); toast('Artículo agregado al pedido'); if(document.getElementById('modal-carrito').classList.contains('translate-x-full')) toggleCart();
         }
 
         function modCarItem(key, delta) {
@@ -784,14 +698,13 @@
         function toggleCart() { document.getElementById('modal-carrito').classList.toggle('translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
 
         function enviarPedido() {
-            if (!carrito.length) return toast('No hay productos en el pedido.');
+            if (!carrito.length) return toast('No hay artículos en el pedido.');
             const nom = document.getElementById('cli-nombre').value.trim();
             const dir = document.getElementById('cli-dir').value.trim();
             const tel = document.getElementById('cli-tel').value.trim();
-            
             if (!nom || !dir || !tel) return toast('Completá nombre, dirección y teléfono para el envío.');
             
-            let txt = `Hola ${db.config.nombre}! Te envío un nuevo pedido:\n\n`;
+            let txt = `Hola Bansur! Les envío un nuevo pedido:\n\n`;
             txt += `👤 *Cliente:* ${nom}\n`;
             txt += `📍 *Dirección:* ${dir}\n`;
             txt += `📱 *WhatsApp:* ${tel}\n\n`;
@@ -804,20 +717,13 @@
             txt += `\n📦 *TOTAL ESTIMADO: ${formatMoney(t)}*`;
             
             window.open(`https://wa.me/${db.config.whatsapp}?text=${encodeURIComponent(txt)}`, '_blank');
-            
-            setTimeout(() => {
-                carrito = [];
-                updateCartUI();
-                toggleCart();
-                toast('¡Pedido enviado! El carrito se vació para el próximo.');
-            }, 1500);
+            setTimeout(() => { carrito = []; updateCartUI(); toggleCart(); toast('¡Pedido enviado con éxito!'); }, 1500);
         }
 
         function generarExcelMuestra() {
-            const data = [{ "SKU": "4", "PRODUCTO": "Zueco Roma", "PRECIO": 69900, "COLORES": "Nude, Negro" }];
+            const data = [{ "SKU": "A26309", "CATEGORIA": "JUGUETES", "PRODUCTO": "Masa Moldeable x12", "PRECIO": 3400, "COLORES": "General" }];
             const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(data);
-            ws['!cols'] = [{wch:10}, {wch:40}, {wch:12}, {wch:25}];
-            XLSX.utils.book_append_sheet(wb, ws, "Catalogo"); XLSX.writeFile(wb, "Plantilla_Catalogo.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Catalogo"); XLSX.writeFile(wb, "Plantilla_Bansur.xlsx");
         }
 
         function subirFotosMasivas(e) {
@@ -825,7 +731,6 @@
             document.getElementById('carga-texto').innerText = "Procesando " + files.length + " fotos...";
             document.getElementById('carga-overlay').style.display='flex';
             let cargadas = 0; let vinculadas = 0;
-            
             const prodsSorted = [...db.productos].sort((a,b) => String(b.sku).length - String(a.sku).length);
 
             Array.from(files).forEach(file => {
@@ -835,53 +740,15 @@
 
                     for (let p of prodsSorted) {
                         let skuLower = String(p.sku).trim().toLowerCase();
-                        
                         if (nombreLimpio === skuLower || nombreLimpio.startsWith(skuLower + '-') || nombreLimpio.startsWith(skuLower + ' ') || nombreLimpio.startsWith(skuLower + '_')) {
-                            
-                            let resto = nombreLimpio.substring(skuLower.length).trim();
-                            resto = resto.replace(/^[-_\s]+/, ''); 
-                            
-                            let bestColorIdx = -1;
-                            let bestScore = -1;
-
-                            if (resto === '') {
-                                bestColorIdx = 0;
-                            } else {
-                                for (let i = 0; i < p.colores.length; i++) {
-                                    let cClean = limpiarTexto(p.colores[i].nombre);
-                                    let rClean = limpiarTexto(resto);
-
-                                    let posIdx = parseInt(resto);
-                                    if (!isNaN(posIdx) && posIdx > 0 && posIdx.toString() === resto) {
-                                        if(i === posIdx - 1) { bestColorIdx = i; bestScore = 9999; break; }
-                                        continue;
-                                    }
-
-                                    if (cClean === rClean) { bestColorIdx = i; bestScore = 1000; break; }
-
-                                    if (rClean.length >= 3 && cClean.length >= 3 && (rClean.includes(cClean) || cClean.includes(rClean))) {
-                                        let score = 500 + cClean.length; 
-                                        if (score > bestScore) { bestColorIdx = i; bestScore = score; }
-                                    }
-                                    
-                                    if (rClean.length >= 4 && cClean.length >= 4 && (cClean.startsWith(rClean.substring(0,4)) || rClean.startsWith(cClean.substring(0,4)))) {
-                                        let score = 300 + cClean.length;
-                                        if (score > bestScore) { bestColorIdx = i; bestScore = score; }
-                                    }
-                                }
-                            }
-
-                            if (bestColorIdx !== -1) {
-                                p.colores[bestColorIdx].img = base64Comprimido;
-                                vinculadas++;
-                                break; 
-                            }
+                            p.colores[0].img = base64Comprimido;
+                            vinculadas++;
+                            break;
                         }
                     }
-                    
-                    cargadas++; document.getElementById('carga-texto').innerText = "Procesando " + cargadas + " de " + files.length + "...";
+                    cargadas++;
                     if(cargadas === files.length) {
-                        salvar(); setTimeout(() => { initApp(); document.getElementById('carga-overlay').style.display='none'; document.getElementById('input-fotos-masivas').value = ''; if(vinculadas === 0) toast(`❌ Las fotos no coincidieron con los SKU.`); else toast(`¡Terminado! ${vinculadas} fotos vinculadas 📸`); }, 500);
+                        salvar(); setTimeout(() => { initApp(); document.getElementById('carga-overlay').style.display='none'; document.getElementById('input-fotos-masivas').value = ''; toast(`¡Terminado! ${vinculadas} fotos vinculadas 📸`); }, 500);
                     }
                 });
             });
@@ -894,64 +761,66 @@
             r.onload = function(evt) {
                 try {
                     let d = new Uint8Array(evt.target.result); let wb = XLSX.read(d, {type:'array'}); let sheet = wb.Sheets[wb.SheetNames[0]]; let json = XLSX.utils.sheet_to_json(sheet, {header:1}); let h = json[0].map(x=>String(x||'').toUpperCase().trim());
-                    let cSku = h.indexOf('SKU'), cProd = h.indexOf('PRODUCTO'), cPre = h.indexOf('PRECIO'), cCol = h.indexOf('COLORES');
-                    if(cSku===-1 || cProd===-1 || cPre===-1) throw new Error("Faltan columnas (SKU, PRODUCTO, PRECIO).");
+                    let cSku = h.indexOf('SKU'), cCat = h.indexOf('CATEGORIA'), cProd = h.indexOf('PRODUCTO'), cPre = h.indexOf('PRECIO'), cCol = h.indexOf('COLORES');
+                    if(cSku===-1 || cProd===-1 || cPre===-1) throw new Error("Faltan columnas obligatorias (SKU, PRODUCTO, PRECIO).");
+                    
                     let nuevosProductos = [];
                     for(let i=1; i<json.length; i++) {
                         let row = json[i]; if(!row || !row[cProd]) continue;
-                        let sku = String(row[cSku]||i).trim(); let nombre = String(row[cProd]).trim(); let precio = parseFloat(String(row[cPre]).replace(',','.')) || 0;
+                        let sku = String(row[cSku]||i).trim(); 
+                        let categoria = cCat !== -1 ? String(row[cCat]||'GENERAL').trim().toUpperCase() : 'GENERAL';
+                        let nombre = String(row[cProd]).trim(); 
+                        let precio = parseFloat(String(row[cPre]).replace(',','.')) || 0;
                         let rawColores = cCol !== -1 ? String(row[cCol]||'General').split(',').map(x=>x.trim()).filter(x=>x) : ['General'];
+                        
                         let prodAnterior = db.productos.find(p => String(p.sku).trim().toLowerCase() === sku.toLowerCase());
                         let arrayColores = rawColores.map((c, idx) => {
-                            let imgAnterior = ''; if(prodAnterior && prodAnterior.colores && prodAnterior.colores[idx]) imgAnterior = prodAnterior.colores[idx].img; else if(idx === 0 && prodAnterior && prodAnterior.colores[0]) imgAnterior = prodAnterior.colores[0].img;
+                            let imgAnterior = ''; if(prodAnterior && prodAnterior.colores && prodAnterior.colores[idx]) imgAnterior = prodAnterior.colores[idx].img;
                             return { id: 'c-' + idx, nombre: c, img: imgAnterior };
                         });
-                        nuevosProductos.push({ id: 'id-' + Date.now() + i, sku: sku, nombre: nombre, precioBase: precio, colores: arrayColores });
+                        nuevosProductos.push({ id: 'id-' + Date.now() + i, sku: sku, categoria: categoria, nombre: nombre, precioBase: precio, colores: arrayColores });
                     }
-                    if(nuevosProductos.length > 0) { db.productos = nuevosProductos; salvar(); initApp(); toast("Excel importado ✅"); } else toast("El Excel está vacío.");
+                    if(nuevosProductos.length > 0) { db.productos = nuevosProductos; salvar(); initApp(); toast("Excel importado con éxito ✅"); } else toast("El Excel está vacío.");
                 } catch(err) { toast("❌ Error: " + err.message); } finally { document.getElementById('carga-overlay').style.display='none'; e.target.value=''; }
             }; r.readAsArrayBuffer(f);
         }
 
         function abrirModalNuevoProducto() {
             document.getElementById('modal-titulo').innerHTML = '✨ Crear Nuevo Artículo';
-            document.getElementById('edit-id').value = ''; document.getElementById('edit-sku').value = ''; document.getElementById('edit-sku').readOnly = false; document.getElementById('edit-sku').classList.remove('bg-stone-100');
-            document.getElementById('edit-nombre').value = ''; document.getElementById('edit-precio').value = ''; 
+            document.getElementById('edit-id').value = ''; document.getElementById('edit-sku').value = ''; 
+            document.getElementById('edit-categoria').value = ''; document.getElementById('edit-nombre').value = ''; 
+            document.getElementById('edit-precio').value = ''; 
             document.getElementById('grupo-crear-colores').classList.remove('hidden'); document.getElementById('edit-colores-texto').value = 'General';
             document.getElementById('grupo-editar-fotos').classList.add('hidden');
-            
-            document.getElementById('modal-edicion').classList.remove('hidden'); 
-            document.getElementById('modal-edicion').classList.add('flex');
+            abrirModalUI('modal-edicion');
         }
 
         function abrirModalEdicion(id) {
             const p = db.productos.find(x => x.id === id); if(!p) return;
-            document.getElementById('modal-titulo').innerHTML = '✏️ Editar y Subir Fotos';
-            document.getElementById('edit-id').value = p.id; document.getElementById('edit-sku').value = p.sku; document.getElementById('edit-sku').readOnly = true; document.getElementById('edit-sku').classList.add('bg-stone-100');
+            document.getElementById('modal-titulo').innerHTML = '✏️ Editar Artículo';
+            document.getElementById('edit-id').value = p.id; document.getElementById('edit-sku').value = p.sku; 
+            document.getElementById('edit-categoria').value = p.categoria || 'GENERAL';
             document.getElementById('edit-nombre').value = p.nombre; document.getElementById('edit-precio').value = p.precioBase; 
             document.getElementById('grupo-crear-colores').classList.add('hidden'); document.getElementById('grupo-editar-fotos').classList.remove('hidden');
+            
             const cCont = document.getElementById('edit-colores-container');
             cCont.innerHTML = p.colores.map((c, idx) => {
-                let imgPrev = c.img; if(!imgPrev || imgPrev.length<100) imgPrev = getPlaceholder('SKU '+p.sku+' '+c.nombre);
+                let imgPrev = c.img; if(!imgPrev || imgPrev.length<100) imgPrev = getPlaceholder('ART '+p.sku);
                 return `
                 <div class="flex items-center gap-3 bg-white p-2 border border-brand-border rounded">
                     <img id="edit-img-prev-${idx}" src="${imgPrev}" class="w-12 h-12 object-cover rounded border border-stone-200">
                     <div class="flex-grow">
-                        <span class="text-xs font-bold text-brand-text block mb-1">Color: ${c.nombre}</span>
+                        <span class="text-xs font-bold text-brand-text block mb-1">Variante: ${c.nombre}</span>
                         <label class="inline-block bg-brand-accent hover:opacity-90 text-white px-3 py-1.5 rounded text-[10px] font-bold cursor-pointer transition shadow-sm">
                             <i class="fas fa-cloud-upload-alt mr-1"></i> Subir Foto <input type="file" accept="image/*" class="hidden" onchange="subirFotoIndividual(event, '${p.id}', ${idx})">
                         </label>
                     </div>
                 </div>`;
             }).join('');
-            
-            document.getElementById('modal-edicion').classList.remove('hidden'); 
-            document.getElementById('modal-edicion').classList.add('flex');
+            abrirModalUI('modal-edicion');
         }
 
-        function cerrarModalEdicion() { 
-            cerrarModal('modal-edicion');
-        }
+        function cerrarModalEdicion() { cerrarModal('modal-edicion'); }
 
         function subirFotoIndividual(e, prodId, colorIndex) {
             const file = e.target.files[0]; if(!file) return;
@@ -959,36 +828,40 @@
         }
 
         function guardarEdicionProducto() {
-            const id = document.getElementById('edit-id').value; const sku = document.getElementById('edit-sku').value.trim(); const nombre = document.getElementById('edit-nombre').value.trim(); const precio = parseFloat(document.getElementById('edit-precio').value) || 0;
+            const id = document.getElementById('edit-id').value; 
+            const sku = document.getElementById('edit-sku').value.trim(); 
+            const categoria = document.getElementById('edit-categoria').value.trim().toUpperCase() || 'GENERAL';
+            const nombre = document.getElementById('edit-nombre').value.trim(); 
+            const precio = parseFloat(document.getElementById('edit-precio').value) || 0;
             if(!sku || !nombre) return toast('SKU y Nombre son obligatorios.');
 
             if (id) {
                 const p = db.productos.find(x => x.id === id); if(!p) return;
-                p.nombre = nombre; p.precioBase = precio; toast('Cambios guardados ✏️');
+                p.categoria = categoria; p.nombre = nombre; p.precioBase = precio; toast('Artículo actualizado ✏️');
             } else {
                 const existe = db.productos.find(x => String(x.sku).toLowerCase() === sku.toLowerCase());
                 if(existe) return toast('❌ El SKU ya existe.');
                 let coloresCrudos = document.getElementById('edit-colores-texto').value.split(',').map(x=>x.trim()).filter(x=>x); if(coloresCrudos.length === 0) coloresCrudos = ['General'];
                 let arrayColores = coloresCrudos.map((c, idx) => { return { id: 'c-' + idx, nombre: c, img: '' }; });
-                db.productos.unshift({ id: 'id-' + Date.now(), sku: sku, nombre: nombre, precioBase: precio, colores: arrayColores });
-                toast('¡Producto creado! Ahora subile las fotos. 🆕');
+                db.productos.unshift({ id: 'id-' + Date.now(), sku: sku, categoria: categoria, nombre: nombre, precioBase: precio, colores: arrayColores });
+                toast('¡Artículo creado con éxito! 🆕');
             }
             salvar(); initApp(); cerrarModalEdicion(); 
         }
 
-        function eliminarProducto(id) { if(confirm('¿Eliminar este producto?')) { db.productos = db.productos.filter(x => x.id !== id); salvar(); initApp(); toast('Producto eliminado 🗑️'); } }
+        function eliminarProducto(id) { if(confirm('¿Eliminar este artículo?')) { db.productos = db.productos.filter(x => x.id !== id); salvar(); initApp(); toast('Artículo eliminado 🗑️'); } }
 
         function renderStockAdmin() {
             const b = document.getElementById('tbody-admin');
             b.innerHTML = db.productos.map(p => {
-                let imgT = p.colores[0] && p.colores[0].img ? p.colores[0].img : getPlaceholder('SKU '+p.sku);
+                let imgT = p.colores[0] && p.colores[0].img ? p.colores[0].img : getPlaceholder('ART '+p.sku);
                 return `
                 <tr class="hover:bg-stone-50 transition">
                     <td class="px-4 py-3"><img src="${imgT}" class="w-10 h-10 object-cover rounded border border-brand-border shadow-sm"></td>
                     <td class="px-4 py-3 font-mono text-xs font-bold">${p.sku}</td>
+                    <td class="px-4 py-3 text-[11px] font-bold text-brand-accent">${p.categoria || 'GENERAL'}</td>
                     <td class="px-4 py-3 font-medium text-xs leading-tight line-clamp-2">${p.nombre}</td>
                     <td class="px-4 py-3 font-bold text-brand-accent">${formatMoney(p.precioBase)}</td>
-                    <td class="px-4 py-3 text-[10px] text-gray-500 leading-tight"><b>C:</b> ${p.colores.map(c=>c.nombre).join(', ')}</td>
                     <td class="px-4 py-3 text-right space-x-2">
                         <button onclick="abrirModalEdicion('${p.id}')" class="text-brand-accent hover:opacity-70 bg-stone-100 px-2 py-1 rounded" title="Editar"><i class="fas fa-pencil-alt"></i></button>
                         <button onclick="eliminarProducto('${p.id}')" class="text-red-500 hover:opacity-70 bg-red-50 px-2 py-1 rounded" title="Eliminar"><i class="fas fa-trash"></i></button>
@@ -998,18 +871,10 @@
         }
 
         function cerrarSesion() { document.body.classList.remove('modo-admin'); }
-        function vaciarDB() { if(confirm('¿Seguro querés vaciar todo?')) { db.productos=[]; salvar(); initApp(); toast('Base vaciada.'); } }
+        function vaciarDB() { if(confirm('¿Seguro querés vaciar todo el catálogo?')) { db.productos=[]; salvar(); initApp(); toast('Base vaciada.'); } }
         function toast(m) { const c=document.getElementById('toast-container'), d=document.createElement('div'); d.className='toast'; d.innerHTML=`<i class="fas fa-info-circle mr-2"></i> ${m}`; c.appendChild(d); setTimeout(()=>{ d.style.animation='slideIn 0.3s reverse forwards'; setTimeout(()=>d.remove(),300); }, 3500); }
         
-        // Anti-curiosos
         document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) { return false; } // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 73) { return false; } // Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 74) { return false; } // Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 85) { return false; } // Ctrl+U
-            if(e.ctrlKey && e.keyCode == 83) { return false; } // Ctrl+S
-        }
     </script>
 </body>
 </html>
