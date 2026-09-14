@@ -186,7 +186,7 @@
                 <span class="text-[10px] uppercase tracking-widest font-bold text-brand-text/60">Total Estimado</span>
                 <h3 class="text-2xl font-serif text-brand-accent" id="total-carrito">$0</h3>
             </div>
-            <button onclick="enviarPedido()" class="w-full bg-brand-accent hover:opacity-90 text-white py-3.5 rounded-lg font-bold shadow-md transition text-sm tracking-wider uppercase flex justify-center items-center gap-2">
+            <button onclick="enviarPedido()" class="w-full bg-brand-accent hover:opacity-90 text-white py-3.5 rounded-xl font-bold shadow-md transition text-sm tracking-wider uppercase flex justify-center items-center gap-2">
                 <i class="fab fa-whatsapp text-lg"></i> Enviar Pedido
             </button>
         </div>
@@ -713,7 +713,7 @@
 
         function toggleCart() { document.getElementById('modal-carrito').classList.toggle('translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
 
-        // FORMATO DE WHATSAPP ACTUALIZADO CON CÓDIGO (ART)
+        // FORMATO DE WHATSAPP ORDENADO: [ART: CÓDIGO] - CANTIDAD x DESCRIPCIÓN (VARIANTE) - PRECIO
         function enviarPedido() {
             if (!carrito.length) return toast('No hay artículos en el pedido.');
             const nom = document.getElementById('cli-nombre').value.trim();
@@ -729,7 +729,7 @@
             let t = 0;
             carrito.forEach(x => {
                 const sub = x.precio * x.qty; t += sub;
-                txt += `▪ ${x.qty}x ${x.prodNombre} (${x.colorNombre}) - [ART: ${x.sku}] - ${formatMoney(sub)}\n`;
+                txt += `▪ [ART: ${x.sku}] - ${x.qty}x ${x.prodNombre} (${x.colorNombre}) - ${formatMoney(sub)}\n`;
             });
             txt += `\n📦 *TOTAL ESTIMADO: ${formatMoney(t)}*`;
             
