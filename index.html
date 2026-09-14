@@ -587,7 +587,6 @@
                 if(!seleccionActual[p.id]) seleccionActual[p.id] = { color: p.colores[0].id, qty: 1 };
                 const state = seleccionActual[p.id]; const colorActivo = p.colores.find(c => c.id === state.color) || p.colores[0];
                 
-                // CORRECCIÓN: Si la variante no tiene foto propia, toma la primera foto disponible del producto (ej: la de la subida masiva)
                 let imgFinal = colorActivo.img;
                 if (!imgFinal || imgFinal.length < 100) {
                     const conFoto = p.colores.find(c => c.img && c.img.length > 100);
@@ -667,7 +666,7 @@
                     if(conFoto) finalImg = conFoto.img;
                 }
                 if(!finalImg || finalImg.length < 100) finalImg = getPlaceholder(p.sku);
-                carrito.push({ key: key, prodNombre: p.nombre, colorNombre: col.nombre, precio: p.precioBase, qty: 1, img: finalImg });
+                carrito.push({ key: key, sku: p.sku, prodNombre: p.nombre, colorNombre: col.nombre, precio: p.precioBase, qty: 1, img: finalImg });
             }
             updateCartUI(); toast('Artículo agregado al pedido'); if(document.getElementById('modal-carrito').classList.contains('translate-x-full')) toggleCart();
         }
@@ -695,7 +694,7 @@
                         <img src="${x.img}" class="w-14 h-14 object-cover rounded-lg border border-brand-border">
                         <div class="flex-grow">
                             <h4 class="text-xs font-bold text-brand-text leading-tight line-clamp-1">${x.prodNombre}</h4>
-                            <p class="text-[10px] text-gray-500 my-0.5">${x.colorNombre}</p>
+                            <p class="text-[10px] text-gray-500 my-0.5">${x.colorNombre} | <span class="font-mono font-bold text-brand-accent">ART: ${x.sku}</span></p>
                             <span class="text-xs font-black text-brand-accent">${x.qty} u. x ${formatMoney(x.precio)}</span>
                         </div>
                         <div class="flex flex-col items-end gap-2">
@@ -714,6 +713,7 @@
 
         function toggleCart() { document.getElementById('modal-carrito').classList.toggle('translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
 
+        // FORMATO DE WHATSAPP ACTUALIZADO CON CÓDIGO (ART)
         function enviarPedido() {
             if (!carrito.length) return toast('No hay artículos en el pedido.');
             const nom = document.getElementById('cli-nombre').value.trim();
@@ -729,7 +729,7 @@
             let t = 0;
             carrito.forEach(x => {
                 const sub = x.precio * x.qty; t += sub;
-                txt += `▪ ${x.qty}x ${x.prodNombre} (${x.colorNombre}) - ${formatMoney(sub)}\n`;
+                txt += `▪ ${x.qty}x ${x.prodNombre} (${x.colorNombre}) - [ART: ${x.sku}] - ${formatMoney(sub)}\n`;
             });
             txt += `\n📦 *TOTAL ESTIMADO: ${formatMoney(t)}*`;
             
