@@ -91,7 +91,7 @@
         </div>
     </div>
 
-    <!-- Botón Volver Arriba Mejorado con clases dinámicas para mostrarse al scrollear -->
+    <!-- Botón Volver Arriba -->
     <button id="btn-subir" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 bg-brand-accent hover:scale-105 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.3)] transition-all duration-300 translate-y-20 opacity-0 pointer-events-none z-[90000] cursor-pointer">
         <i class="fas fa-chevron-up text-xl"></i>
     </button>
@@ -218,7 +218,7 @@
                 <div class="w-10 h-10 bg-brand-accent text-white rounded-lg flex items-center justify-center text-lg"><i class="fas fa-sliders-h"></i></div>
                 <div>
                     <h2 class="font-serif text-xl text-brand-text leading-tight">Panel Bansur Admin</h2>
-                    <span class="text-[10px] text-brand-text/60 font-bold uppercase tracking-widest">Gestión de Artículos y Categorías</span>
+                    <span class="text-[10px] text-brand-text/60 font-bold uppercase tracking-widest">Gestión de Artículos, Categorías y Ayuda</span>
                 </div>
             </div>
             <div class="flex gap-2">
@@ -232,80 +232,185 @@
         </header>
 
         <main class="flex-1 max-w-7xl mx-auto w-full p-6 space-y-6 flex-grow">
-            <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm space-y-4">
-                <h3 class="font-serif text-lg text-brand-text">⚙️ Configuración General</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Nombre Tienda</label>
-                        <input type="text" id="input-nombre-tienda" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
+            <!-- PESTAÑAS DE NAVEGACIÓN ADMIN -->
+            <div class="flex border-b border-brand-border gap-6">
+                <button onclick="cambiarTabAdmin('gestion')" id="tab-btn-gestion" class="pb-3 text-sm font-bold border-b-2 border-brand-accent text-brand-accent transition">📦 Gestión de Artículos</button>
+                <button onclick="cambiarTabAdmin('manual')" id="tab-btn-manual" class="pb-3 text-sm font-bold border-b-2 border-transparent text-brand-text/60 hover:text-brand-text transition">📖 Manual de Usuario</button>
+            </div>
+
+            <!-- CONTENIDO TAB: GESTIÓN -->
+            <div id="tab-content-gestion" class="space-y-6">
+                <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm space-y-4">
+                    <h3 class="font-serif text-lg text-brand-text">⚙️ Configuración General</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Nombre Tienda</label>
+                            <input type="text" id="input-nombre-tienda" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">WhatsApp Pedidos</label>
+                            <input type="text" id="input-whatsapp" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Paleta Color</label>
+                            <select id="select-paleta" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent bg-white">
+                                <option value="suede">Deep Suede Brown (Café)</option>
+                                <option value="terracota">Warm Terracotta (Terracota)</option>
+                                <option value="olive">Olive Green (Verde Oliva)</option>
+                                <option value="yute">Creamy Jute (Yute/Crema)</option>
+                                <option value="rosa">Soft Pink (Rosa)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-accent mb-1">PIN Admin</label>
+                            <input type="password" id="input-pin" maxlength="4" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent text-brand-accent font-bold text-center tracking-widest">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">WhatsApp Pedidos</label>
-                        <input type="text" id="input-whatsapp" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-text/70 mb-1">Paleta Color</label>
-                        <select id="select-paleta" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent bg-white">
-                            <option value="suede">Deep Suede Brown (Café)</option>
-                            <option value="terracota">Warm Terracotta (Terracota)</option>
-                            <option value="olive">Olive Green (Verde Oliva)</option>
-                            <option value="yute">Creamy Jute (Yute/Crema)</option>
-                            <option value="rosa">Soft Pink (Rosa)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-accent mb-1">PIN Admin</label>
-                        <input type="password" id="input-pin" maxlength="4" class="w-full border border-brand-border p-2.5 rounded-lg text-sm outline-none focus:border-brand-accent text-brand-accent font-bold text-center tracking-widest">
+                    <div class="flex justify-end pt-2">
+                        <button onclick="guardarConfiguracion()" class="bg-brand-text hover:bg-brand-accent text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition shadow-sm">Guardar Cambios</button>
                     </div>
                 </div>
-                <div class="flex justify-end pt-2">
-                    <button onclick="guardarConfiguracion()" class="bg-brand-text hover:bg-brand-accent text-white px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition shadow-sm">Guardar Cambios</button>
+
+                <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="abrirModalNuevoProducto()" class="bg-brand-text hover:bg-brand-accent text-white px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                            <i class="fas fa-plus mr-2"></i> Nuevo Artículo
+                        </button>
+                        <label class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center shadow-sm">
+                            <i class="fas fa-file-excel mr-2"></i> Subir Excel
+                            <input type="file" accept=".xlsx" class="hidden" onchange="importarExcel(event)">
+                        </label>
+                        <button onclick="generarExcelMuestra()" class="bg-stone-100 hover:bg-stone-200 text-brand-text px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-brand-border">
+                            <i class="fas fa-download mr-2 text-brand-accent"></i> Bajar Plantilla Excel
+                        </button>
+                        <button onclick="vaciarDB()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-red-200">
+                            <i class="fas fa-trash-alt mr-2"></i> Vaciar DB
+                        </button>
+                    </div>
+                    <div class="bg-brand-bg border border-brand-border p-3 rounded-lg flex items-center gap-3">
+                        <div class="text-xs">
+                            <span class="font-bold block text-brand-text">Carga de Fotos Masiva</span>
+                            <span class="text-[10px] text-brand-text/60">Ej: SKU.jpg</span>
+                        </div>
+                        <label class="bg-brand-accent hover:opacity-90 text-white px-4 py-2 rounded-md text-xs font-bold cursor-pointer transition shadow-sm">
+                            <i class="fas fa-arrow-up mr-2"></i> Subir Fotos
+                            <input type="file" id="input-fotos-masivas" accept="image/*" multiple class="hidden" onchange="subirFotosMasivas(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-brand-border rounded-xl overflow-hidden shadow-sm mb-4">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-brand-text">
+                            <thead class="bg-stone-50 text-brand-text/60 font-semibold border-b border-brand-border text-[11px] uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3 w-16">Foto</th>
+                                    <th class="px-4 py-3 w-20">SKU</th>
+                                    <th class="px-4 py-3 w-32">Categoría</th>
+                                    <th class="px-4 py-3">Producto</th>
+                                    <th class="px-4 py-3">Precio</th>
+                                    <th class="px-4 py-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-admin" class="divide-y divide-brand-border/40"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-xl p-6 shadow-sm flex flex-wrap gap-4 items-center justify-between">
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="abrirModalNuevoProducto()" class="bg-brand-text hover:bg-brand-accent text-white px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
-                        <i class="fas fa-plus mr-2"></i> Nuevo Artículo
-                    </button>
-                    <label class="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center shadow-sm">
-                        <i class="fas fa-file-excel mr-2"></i> Subir Excel
-                        <input type="file" accept=".xlsx" class="hidden" onchange="importarExcel(event)">
-                    </label>
-                    <button onclick="generarExcelMuestra()" class="bg-stone-100 hover:bg-stone-200 text-brand-text px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-brand-border">
-                        <i class="fas fa-download mr-2 text-brand-accent"></i> Bajar Plantilla Excel
-                    </button>
-                    <button onclick="vaciarDB()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-xs font-bold transition flex items-center border border-red-200">
-                        <i class="fas fa-trash-alt mr-2"></i> Vaciar DB
-                    </button>
-                </div>
-                <div class="bg-brand-bg border border-brand-border p-3 rounded-lg flex items-center gap-3">
-                    <div class="text-xs">
-                        <span class="font-bold block text-brand-text">Carga de Fotos Masiva</span>
-                        <span class="text-[10px] text-brand-text/60">Ej: SKU.jpg</span>
+            <!-- CONTENIDO TAB: MANUAL DE USUARIO -->
+            <div id="tab-content-manual" class="space-y-6 hidden">
+                <div class="bg-white border border-brand-border rounded-xl p-6 md:p-8 shadow-sm space-y-6">
+                    <div class="border-b border-brand-border pb-4">
+                        <h3 class="font-serif text-2xl text-brand-text mb-1">📖 Manual de Usuario - Panel Bansur</h3>
+                        <p class="text-xs text-brand-text/70">Guía práctica paso a paso para administrar productos, precios, fotos y la configuración general del catálogo.</p>
                     </div>
-                    <label class="bg-brand-accent hover:opacity-90 text-white px-4 py-2 rounded-md text-xs font-bold cursor-pointer transition shadow-sm">
-                        <i class="fas fa-arrow-up mr-2"></i> Subir Fotos
-                        <input type="file" id="input-fotos-masivas" accept="image/*" multiple class="hidden" onchange="subirFotosMasivas(event)">
-                    </label>
-                </div>
-            </div>
 
-            <div class="bg-white border border-brand-border rounded-xl overflow-hidden shadow-sm mb-4">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-brand-text">
-                        <thead class="bg-stone-50 text-brand-text/60 font-semibold border-b border-brand-border text-[11px] uppercase tracking-wider">
-                            <tr>
-                                <th class="px-4 py-3 w-16">Foto</th>
-                                <th class="px-4 py-3 w-20">SKU</th>
-                                <th class="px-4 py-3 w-32">Categoría</th>
-                                <th class="px-4 py-3">Producto</th>
-                                <th class="px-4 py-3">Precio</th>
-                                <th class="px-4 py-3 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-admin" class="divide-y divide-brand-border/40"></tbody>
-                    </table>
+                    <!-- Acordeones de Ayuda -->
+                    <div class="space-y-4 text-xs md:text-sm">
+                        <!-- Sección 1 -->
+                        <div class="border border-brand-border rounded-xl overflow-hidden bg-brand-bg/50">
+                            <button onclick="toggleAcordeon('manual-1')" class="w-full p-4 text-left font-bold text-brand-text flex justify-between items-center bg-white hover:bg-stone-50 transition">
+                                <span>1. ¿Cómo actualizar precios o artículos usando Excel?</span>
+                                <i class="fas fa-chevron-down text-brand-accent"></i>
+                            </button>
+                            <div id="manual-1" class="p-4 space-y-2 hidden text-brand-text/80 leading-relaxed border-t border-brand-border bg-white">
+                                <p>Para cargar o actualizar productos de forma masiva sin romper la estructura:</p>
+                                <ol class="list-decimal list-inside space-y-1 pl-2">
+                                    <li>Hacé clic en el botón <strong class="text-brand-accent">"Bajar Plantilla Excel"</strong> para descargar el archivo de muestra modelo.</li>
+                                    <li>Abrilo en Excel o Google Sheets. Las columnas obligatorias son: <strong>SKU</strong>, <strong>CATEGORIA</strong>, <strong>PRODUCTO</strong>, <strong>PRECIO</strong> y <strong>COLORES</strong>.</li>
+                                    <li>Completá o modificá tus datos respetando las cabeceras y guardalo como archivo `.xlsx`.</li>
+                                    <li>Hacé clic en <strong class="text-green-700">"Subir Excel"</strong> y seleccioná tu planilla. El sistema actualizará los precios y mantendrá las fotos que ya tenías vinculadas.</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2 -->
+                        <div class="border border-brand-border rounded-xl overflow-hidden bg-brand-bg/50">
+                            <button onclick="toggleAcordeon('manual-2')" class="w-full p-4 text-left font-bold text-brand-text flex justify-between items-center bg-white hover:bg-stone-50 transition">
+                                <span>2. ¿Cómo subir y asociar las fotos masivamente?</span>
+                                <i class="fas fa-chevron-down text-brand-accent"></i>
+                            </button>
+                            <div id="manual-2" class="p-4 space-y-2 hidden text-brand-text/80 leading-relaxed border-t border-brand-border bg-white">
+                                <p>El sistema vincula las fotos automáticamente mediante el código SKU:</p>
+                                <ul class="list-disc list-inside space-y-1 pl-2">
+                                    <li>Nombrá tus archivos de imagen exactamente igual al SKU del artículo (Por ejemplo: <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-brand-accent">A26309.jpg</code> o <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-brand-accent">B26310.png</code>).</li>
+                                    <li>Hacé clic en el botón <strong class="text-brand-accent">"Subir Fotos"</strong> en el panel superior derecho.</li>
+                                    <li>Seleccioná todas las fotos juntas (podés marcar muchas a la vez arrastrando el mouse o con Shift/Ctrl).</li>
+                                    <li>El sistema las comprimirá automáticamente para que la tienda cargue volando y las asociará con su respectivo producto.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3 -->
+                        <div class="border border-brand-border rounded-xl overflow-hidden bg-brand-bg/50">
+                            <button onclick="toggleAcordeon('manual-3')" class="w-full p-4 text-left font-bold text-brand-text flex justify-between items-center bg-white hover:bg-stone-50 transition">
+                                <span>3. ¿Cómo modificar datos o cambiar una foto individual?</span>
+                                <i class="fas fa-chevron-down text-brand-accent"></i>
+                            </button>
+                            <div id="manual-3" class="p-4 space-y-2 hidden text-brand-text/80 leading-relaxed border-t border-brand-border bg-white">
+                                <p>Si querés editar un producto puntual o cambiar su foto específica:</p>
+                                <ol class="list-decimal list-inside space-y-1 pl-2">
+                                    <li>Buscá el artículo en la tabla del panel de administración.</li>
+                                    <li>Hacé clic en el ícono del lápiz <i class="fas fa-pencil-alt text-brand-accent mx-1"></i> (Editar).</li>
+                                    <li>Se abrirá una ventana donde podrás cambiar el nombre, precio, categoría o subir/reemplazar la foto de cada variante de color de forma individual.</li>
+                                    <li>Hacé clic en <strong>Guardar</strong> y los cambios se reflejarán al instante en la tienda online.</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Sección 4 -->
+                        <div class="border border-brand-border rounded-xl overflow-hidden bg-brand-bg/50">
+                            <button onclick="toggleAcordeon('manual-4')" class="w-full p-4 text-left font-bold text-brand-text flex justify-between items-center bg-white hover:bg-stone-50 transition">
+                                <span>4. ¿Cómo cambiar el nombre, el WhatsApp de pedidos y la paleta de colores?</span>
+                                <i class="fas fa-chevron-down text-brand-accent"></i>
+                            </button>
+                            <div id="manual-4" class="p-4 space-y-2 hidden text-brand-text/80 leading-relaxed border-t border-brand-border bg-white">
+                                <p>En la sección superior de <strong>⚙️ Configuración General</strong>:</p>
+                                <ul class="list-disc list-inside space-y-1 pl-2">
+                                    <li><strong>Nombre Tienda:</strong> Modifica el título superior que ven tus clientes.</li>
+                                    <li><strong>WhatsApp Pedidos:</strong> Ingresá el número con característica internacional sin símbolos (Ej: <code class="bg-stone-100 px-1.5 py-0.5 rounded font-mono text-brand-accent">5491121586674</code>) para que los pedidos lleguen directo a tu chat.</li>
+                                    <li><strong>Paleta de Color:</strong> Elegí entre las opciones disponibles (Café, Terracotta, Oliva, Yute, Rosa) para cambiar la estética visual de todo el catálogo en un segundo.</li>
+                                    <li>No te olvides de presionar <strong class="text-brand-text">"Guardar Cambios"</strong> al terminar.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Sección 5 -->
+                        <div class="border border-brand-border rounded-xl overflow-hidden bg-brand-bg/50">
+                            <button onclick="toggleAcordeon('manual-5')" class="w-full p-4 text-left font-bold text-brand-text flex justify-between items-center bg-white hover:bg-stone-50 transition">
+                                <span>5. ¿Cómo funciona el envío de pedidos por WhatsApp?</span>
+                                <i class="fas fa-chevron-down text-brand-accent"></i>
+                            </button>
+                            <div id="manual-5" class="p-4 space-y-2 hidden text-brand-text/80 leading-relaxed border-t border-brand-border bg-white">
+                                <p>Tus clientes navegan por el catálogo, filtran por categorías, seleccionan cantidad y variantes, y agregan los productos al carrito. Al finalizar:</p>
+                                <ul class="list-disc list-inside space-y-1 pl-2">
+                                    <li>Completan sus datos obligatorios (Nombre, Dirección y Teléfono).</li>
+                                    <li>Al hacer clic en <strong>"Enviar Pedido"</strong>, se abre WhatsApp automáticamente con un mensaje formateado prolijamente conteniendo el desglose detallado de artículos, variantes, subtotales y datos de envío del cliente listos para gestionar la venta.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -365,6 +470,33 @@
     <div id="toast-container"></div>
 
     <script>
+        // CONTROL DE TABS EN ADMIN (Gestión / Manual)
+        function cambiarTabAdmin(tab) {
+            const btnGestion = document.getElementById('tab-btn-gestion');
+            const btnManual = document.getElementById('tab-btn-manual');
+            const contentGestion = document.getElementById('tab-content-gestion');
+            const contentManual = document.getElementById('tab-content-manual');
+
+            if(tab === 'gestion') {
+                btnGestion.className = "pb-3 text-sm font-bold border-b-2 border-brand-accent text-brand-accent transition";
+                btnManual.className = "pb-3 text-sm font-bold border-b-2 border-transparent text-brand-text/60 hover:text-brand-text transition";
+                contentGestion.classList.remove('hidden');
+                contentManual.classList.add('hidden');
+            } else {
+                btnManual.className = "pb-3 text-sm font-bold border-b-2 border-brand-accent text-brand-accent transition";
+                btnGestion.className = "pb-3 text-sm font-bold border-b-2 border-transparent text-brand-text/60 hover:text-brand-text transition";
+                contentManual.classList.remove('hidden');
+                contentGestion.classList.add('hidden');
+            }
+        }
+
+        function toggleAcordeon(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.toggle('hidden');
+            }
+        }
+
         // CONTROL DE SCROLL PARA MOSTRAR/OCULTAR EL BOTÓN SUBIR
         window.addEventListener('scroll', () => {
             const btnSubir = document.getElementById('btn-subir');
