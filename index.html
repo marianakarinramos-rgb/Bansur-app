@@ -29,11 +29,11 @@
                     },
                     colors: {
                         brand: {
-                            bg: 'var(--brand-bg)',      
+                            bg: 'var(--brand-bg)',    
                             card: '#FFFFFF',    
                             text: 'var(--brand-text)',    
                             accent: 'var(--brand-accent)',  
-                            border: 'var(--brand-border)'   
+                            border: 'var(--brand-border)'    
                         }
                     }
                 }
@@ -52,9 +52,11 @@
 
         body { background-color: var(--brand-bg); color: var(--brand-text); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         
-        ::-webkit-scrollbar { width: 6px; height: 6px; } 
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--brand-border); border-radius: 4px; }
+        /* SCROLLBAR MEJORADA: Visible, ancha y cómoda para agarrar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; } 
+        ::-webkit-scrollbar-track { background: var(--brand-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--brand-accent); border-radius: 6px; border: 2px solid var(--brand-bg); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--brand-text); }
         
         body.modo-admin #vista-tienda { display: none !important; }
         body.modo-admin #vista-admin { display: flex !important; }
@@ -89,8 +91,8 @@
         </div>
     </div>
 
-    <!-- Botón Volver Arriba -->
-    <button id="btn-subir" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 bg-brand-accent hover:opacity-90 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.4)] transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-[90000]">
+    <!-- Botón Volver Arriba Mejorado con clases dinámicas para mostrarse al scrollear -->
+    <button id="btn-subir" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 bg-brand-accent hover:scale-105 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.3)] transition-all duration-300 translate-y-20 opacity-0 pointer-events-none z-[90000] cursor-pointer">
         <i class="fas fa-chevron-up text-xl"></i>
     </button>
 
@@ -363,6 +365,16 @@
     <div id="toast-container"></div>
 
     <script>
+        // CONTROL DE SCROLL PARA MOSTRAR/OCULTAR EL BOTÓN SUBIR
+        window.addEventListener('scroll', () => {
+            const btnSubir = document.getElementById('btn-subir');
+            if (window.scrollY > 300) {
+                btnSubir.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            } else {
+                btnSubir.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }
+        });
+
         function abrirModalUI(id) { const el = document.getElementById(id); if(el){ el.classList.remove('hidden'); el.classList.add('flex'); } }
         function cerrarModal(id) { const el = document.getElementById(id); if(el){ el.classList.add('hidden'); el.classList.remove('flex'); } }
 
@@ -713,7 +725,6 @@
 
         function toggleCart() { document.getElementById('modal-carrito').classList.toggle('translate-x-full'); document.getElementById('overlay').classList.toggle('hidden'); }
 
-        // FORMATO DE WHATSAPP ORDENADO: [ART: CÓDIGO] - CANTIDAD x DESCRIPCIÓN (VARIANTE) - PRECIO
         function enviarPedido() {
             if (!carrito.length) return toast('No hay artículos en el pedido.');
             const nom = document.getElementById('cli-nombre').value.trim();
